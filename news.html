@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Hot News — Coins Up 10%+</title>
+<meta name="description" content="Latest crypto news for coins surging 10% or more. Real-time news from Google News and CoinDesk.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.memeyuyu.com/news.html">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;background:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#f1f5f9}
+#wrap{max-width:900px;margin:0 auto;padding:16px 12px 40px}
+
+/* header */
+#header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+#header-left{display:flex;align-items:center;gap:12px}
+.back-btn{padding:5px 12px;font-size:12px;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#94a3b8;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:4px}
+.back-btn:hover{background:#334155;color:#f1f5f9}
+#page-title{font-size:18px;font-weight:700;color:#f1f5f9}
+#page-sub{font-size:11px;color:#475569;margin-top:2px}
+#lang-bar{display:flex;gap:4px}
+.lbtn{padding:3px 9px;font-size:11px;font-weight:500;border:1px solid #1e293b;border-radius:5px;background:#1e293b;color:#64748b;cursor:pointer}
+.lbtn.on{background:#334155;color:#f1f5f9;border-color:#475569}
+
+/* 로딩 */
+#loading{text-align:center;padding:60px 0;color:#475569;font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid #1e293b;border-top-color:#3b82f6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 코인 섹션 */
+.coin-section{margin-bottom:28px;background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155}
+.coin-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #334155;background:#1a2744}
+.coin-badge{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#fff}
+.coin-name{font-size:14px;font-weight:600;color:#f1f5f9}
+.coin-chg{font-size:13px;font-weight:700;color:#34d399}
+.coin-price{font-size:12px;color:#64748b;margin-left:auto}
+.news-link-btn{font-size:11px;padding:3px 10px;background:#0f172a;border:1px solid #334155;border-radius:5px;color:#94a3b8;text-decoration:none;white-space:nowrap}
+.news-link-btn:hover{color:#f1f5f9;border-color:#475569}
+
+/* 뉴스 아이템 */
+.news-list{padding:4px 0}
+.news-item{display:flex;flex-direction:column;gap:4px;padding:10px 16px;border-bottom:1px solid #0f172a;transition:background .1s}
+.news-item:last-child{border-bottom:none}
+.news-item:hover{background:#243554}
+.news-top{display:flex;align-items:flex-start;gap:8px}
+.news-source{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.src-ko{background:#1d4ed8;color:#bfdbfe}
+.src-en{background:#065f46;color:#a7f3d0}
+.src-cd{background:#7c2d12;color:#fed7aa}
+.news-title{font-size:13px;color:#e2e8f0;line-height:1.4;text-decoration:none}
+.news-title:hover{color:#93c5fd}
+.news-desc{font-size:11px;color:#475569;line-height:1.4;padding-left:0}
+.news-date{font-size:10px;color:#334155;text-align:right}
+
+/* 빈 상태 */
+.no-news{padding:16px;text-align:center;color:#475569;font-size:12px}
+.no-coins{text-align:center;padding:60px 0;color:#475569}
+.no-coins p{font-size:14px;margin-bottom:8px}
+.no-coins small{font-size:12px;color:#334155}
+
+/* 상단 요약 */
+#summary{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.summary-badge{padding:4px 12px;border-radius:6px;font-size:12px;background:#1e293b;border:1px solid #334155;color:#94a3b8}
+.summary-badge span{color:#34d399;font-weight:600}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="header">
+    <div id="header-left">
+      <a href="/" class="back-btn">← Treemap</a>
+      <div>
+        <div id="page-title">🔥 Hot Coins News</div>
+        <div id="page-sub">Coins up 10%+ · Latest news</div>
+      </div>
+    </div>
+    <div id="lang-bar">
+      <button class="lbtn on" data-lang="en">EN</button>
+      <button class="lbtn" data-lang="ko">한국어</button>
+      <button class="lbtn" data-lang="ja">日本語</button>
+      <button class="lbtn" data-lang="zh">中文</button>
+      <button class="lbtn" data-lang="es">ES</button>
+    </div>
+  </div>
+
+  <div id="summary"></div>
+  <div id="loading"><div class="spinner"></div><div id="loading-text">Loading hot coins...</div></div>
+  <div id="content"></div>
+</div>
+
+<script>
+const WORKERS_URL = 'https://super-pine-8cee.ghdbsfk.workers.dev';
+const NEWS_URL    = 'https://dark-silence-abb2.ghdbsfk.workers.dev';
+
+const I18N = {
+  en: { title:'🔥 Hot Coins News', sub:'Coins up 10%+ · Latest news', loading:'Loading hot coins...', noCoins:'No coins up 10%+ right now', noCoinsDesc:'Check back later!', noNews:'No news found', back:'← Treemap', srcKo:'KR News', srcEn:'EN News', srcCd:'CoinDesk' },
+  ko: { title:'🔥 급등 코인 뉴스', sub:'24h 10% 이상 상승 코인 · 최신 뉴스', loading:'급등 코인 불러오는 중...', noCoins:'현재 10% 이상 상승 코인 없음', noCoinsDesc:'나중에 다시 확인해주세요!', noNews:'뉴스를 찾을 수 없습니다', back:'← 트리맵', srcKo:'한국 뉴스', srcEn:'영어 뉴스', srcCd:'CoinDesk' },
+  ja: { title:'🔥 急騰コインニュース', sub:'24h 10%以上上昇 · 最新ニュース', loading:'急騰コインを読み込み中...', noCoins:'現在10%以上上昇のコインなし', noCoinsDesc:'後でまた確認してください', noNews:'ニュースが見つかりません', back:'← ツリーマップ', srcKo:'韓国ニュース', srcEn:'英語ニュース', srcCd:'CoinDesk' },
+  zh: { title:'🔥 暴涨币种新闻', sub:'24h 涨幅10%以上 · 最新新闻', loading:'加载暴涨币种...', noCoins:'当前没有涨幅10%以上的币种', noCoinsDesc:'请稍后再查！', noNews:'未找到新闻', back:'← 树状图', srcKo:'韩国新闻', srcEn:'英文新闻', srcCd:'CoinDesk' },
+  es: { title:'🔥 Noticias de Monedas Calientes', sub:'Monedas +10% · Últimas noticias', loading:'Cargando monedas calientes...', noCoins:'No hay monedas con +10% ahora', noCoinsDesc:'¡Vuelve más tarde!', noNews:'No se encontraron noticias', back:'← Mapa', srcKo:'Noticias KR', srcEn:'Noticias EN', srcCd:'CoinDesk' },
+};
+
+function detectLang(){const p=new URLSearchParams(location.search).get('lang');if(p&&I18N[p])return p;const bl=(navigator.language||'en').slice(0,2);return I18N[bl]?bl:'en';}
+let lang = detectLang();
+const t = () => I18N[lang];
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.getElementById('page-title').textContent = t().title;
+  document.getElementById('page-sub').textContent = t().sub;
+  document.getElementById('loading-text').textContent = t().loading;
+  document.querySelector('.back-btn').textContent = t().back;
+  document.querySelectorAll('.lbtn').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  const url = new URL(location); url.searchParams.set('lang', lang); history.replaceState(null,'',url);
+}
+
+function timeAgo(iso) {
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return `${Math.floor(diff)}s ago`;
+  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
+  return `${Math.floor(diff/86400)}d ago`;
+}
+
+function srcClass(source) {
+  if (source?.includes('KR')) return 'src-ko';
+  if (source?.includes('CoinDesk')) return 'src-cd';
+  return 'src-en';
+}
+
+function srcLabel(source) {
+  if (source?.includes('KR')) return t().srcKo;
+  if (source?.includes('CoinDesk')) return t().srcCd;
+  return t().srcEn;
+}
+
+function renderCoins(hotCoins) {
+  const content = document.getElementById('content');
+  const summary = document.getElementById('summary');
+
+  summary.innerHTML = `
+    <div class="summary-badge">🔥 <span>${hotCoins.length}</span> coins up 10%+</div>
+    <div class="summary-badge">⏰ Updated: ${new Date().toLocaleTimeString()}</div>
+  `;
+
+  if (!hotCoins.length) {
+    content.innerHTML = `<div class="no-coins"><p>${t().noCoins}</p><small>${t().noCoinsDesc}</small></div>`;
+    return;
+  }
+
+  content.innerHTML = hotCoins.map(c => `
+    <div class="coin-section" id="coin-${c.symbol}">
+      <div class="coin-header">
+        <div class="coin-badge" style="background:${chgColor(c.price_change_percentage_24h)}">${c.symbol}</div>
+        <div class="coin-name">${c.name}</div>
+        <div class="coin-chg">▲${c.price_change_percentage_24h.toFixed(2)}%</div>
+        <div class="coin-price">$${c.current_price < 0.01 ? c.current_price.toFixed(5) : c.current_price.toLocaleString('en',{maximumFractionDigits:2})}</div>
+        <a href="/news.html?symbol=${c.symbol}&name=${encodeURIComponent(c.name)}" class="news-link-btn">More →</a>
+      </div>
+      <div class="news-list" id="news-${c.symbol}">
+        <div class="no-news">Loading news...</div>
+      </div>
+    </div>
+  `).join('');
+
+  // 각 코인별 뉴스 비동기 로드
+  hotCoins.forEach(c => loadNews(c));
+}
+
+function chgColor(v) {
+  if (v >= 30) return '#7c3aed';
+  if (v >= 20) return '#b91c1c';
+  if (v >= 10) return '#059669';
+  return '#334155';
+}
+
+async function loadNews(coin) {
+  const el = document.getElementById(`news-${coin.symbol}`);
+  try {
+    const r = await fetch(`${NEWS_URL}/?symbol=${coin.symbol}&name=${encodeURIComponent(coin.name)}`);
+    const data = await r.json();
+    const news = data.news || [];
+
+    if (!news.length) {
+      el.innerHTML = `<div class="no-news">${t().noNews}</div>`;
+      return;
+    }
+
+    el.innerHTML = news.map(n => `
+      <div class="news-item">
+        <div class="news-top">
+          <span class="news-source ${srcClass(n.source)}">${srcLabel(n.source)}</span>
+          <a href="${n.link}" target="_blank" rel="noopener" class="news-title">${n.title}</a>
+        </div>
+        ${n.desc ? `<div class="news-desc">${n.desc}</div>` : ''}
+        <div class="news-date">${timeAgo(n.date)}</div>
+      </div>
+    `).join('');
+  } catch {
+    el.innerHTML = `<div class="no-news">${t().noNews}</div>`;
+  }
+}
+
+async function load() {
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('content').innerHTML = '';
+
+  // URL에 특정 코인이 있으면 그 코인만 표시
+  const urlParams = new URLSearchParams(location.search);
+  const singleSymbol = urlParams.get('symbol');
+  const singleName   = urlParams.get('name');
+
+  if (singleSymbol) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('page-title').textContent = `📰 ${singleSymbol} News`;
+    const fakeCoin = { symbol: singleSymbol, name: singleName || singleSymbol, current_price: 0, price_change_percentage_24h: 0 };
+    renderCoins([fakeCoin]);
+    return;
+  }
+
+  try {
+    const r = await fetch(WORKERS_URL);
+    const coins = await r.json();
+
+    // 10% 이상 상승 코인 필터
+    const hotCoins = coins
+      .filter(c => c.price_change_percentage_24h >= 10)
+      .sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
+
+    document.getElementById('loading').style.display = 'none';
+    renderCoins(hotCoins);
+  } catch {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').innerHTML = `<div class="no-coins"><p>Failed to load data</p></div>`;
+  }
+}
+
+document.querySelectorAll('.lbtn').forEach(b => {
+  b.addEventListener('click', () => { lang = b.dataset.lang; applyLang(); });
+});
+
+applyLang();
+load();
+</script>
+</body>
+</html>
