@@ -9,6 +9,16 @@
 <meta name="author" content="Crypto Treemap">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://www.memeyuyu.com/">
+<!-- ✅ 파비콘 -->
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- ✅ 테마 색상 (모바일 브라우저 상단바) -->
+<meta name="theme-color" content="#0f172a">
+
+<!-- ✅ 뷰포트 추가 정보 -->
+<meta name="format-detection" content="telephone=no">
+
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.memeyuyu.com/">
 <meta property="og:title" content="Crypto Treemap — Live Cryptocurrency Market Visualization">
@@ -30,9 +40,45 @@
 <link rel="alternate" hreflang="zh" href="https://www.memeyuyu.com/?lang=zh">
 <link rel="alternate" hreflang="es" href="https://www.memeyuyu.com/?lang=es">
 <link rel="alternate" hreflang="x-default" href="https://www.memeyuyu.com/">
+<!-- ✅ 이렇게 두 개로 분리 -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Crypto Treemap","url":"https://www.memeyuyu.com/","description":"Real-time cryptocurrency market treemap visualization for 240+ coins.","applicationCategory":"FinanceApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"inLanguage":["en","ko","ja","zh","es"]}
-</script>
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Crypto Treemap",
+    "url": "https://www.memeyuyu.com/",
+    "description": "Real-time cryptocurrency market treemap visualization for 240+ coins.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+    "inLanguage": ["en","ko","ja","zh","es"]
+  }
+  </script>
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a crypto treemap?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A crypto treemap visualizes cryptocurrency market data where tile size represents market cap and color shows 24h price change."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often is the data updated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Data is fetched live from the API each time you load the page."
+        }
+      }
+    ]
+  }
+  </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -164,7 +210,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="leg"><div class="ldot" style="background:#b91c1c"></div>-5%↓</div>
   </div>
 
-  <div id="map"></div>
+  <div id="map">
+    <!-- 로딩 전 크롤러가 읽을 정적 콘텐츠 -->
+    <noscript>
+      <div style="padding:20px;color:#94a3b8">
+        <h2>Live Cryptocurrency Prices</h2>
+        <p>Bitcoin (BTC), Ethereum (ETH), Solana (SOL), XRP and 240+ coins.
+        Enable JavaScript to view the interactive treemap.</p>
+      </div>
+    </noscript>
+  </div>
   <div id="tip"></div>
 </div>
 
@@ -351,6 +406,13 @@ function render(){
 }
 
 async function load(){
+  const container = document.getElementById('map');
+  // 로딩 중 크롤러 + 사용자용 텍스트
+  container.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#475569;gap:8px">
+      <div style="font-size:14px">Loading 240+ cryptocurrencies...</div>
+      <div style="font-size:11px">Bitcoin · Ethereum · Solana · XRP · BNB</div>
+    </div>`;
   const status=document.getElementById('status');
   status.textContent=t().loading;
   try{
@@ -376,5 +438,12 @@ document.querySelectorAll('.lbtn').forEach(b=>{
 window.addEventListener('resize',()=>render());
 load();
 </script>
+<!-- ✅ 크롤러용 텍스트 콘텐츠 (overflow:hidden으로 숨김) -->
+<div style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0" aria-hidden="true">
+  <h1>Crypto Treemap — Live Cryptocurrency Market Visualization</h1>
+  <p>Track Bitcoin, Ethereum, Solana, XRP and 240+ cryptocurrencies in real-time. 
+  View market cap, price changes, and trading volume in an interactive heatmap.</p>
+  <p>코인 트리맵 - 실시간 암호화폐 시세 히트맵. 비트코인, 이더리움 등 240개 이상의 코인을 시각화.</p>
+</div>
 </body>
 </html>
